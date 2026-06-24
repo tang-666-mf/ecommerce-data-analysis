@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电商数据分析看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #1e293b; }
+        .header { background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%); color: white; padding: 20px 30px; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 20px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .kpi-card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center; }
+        .kpi-card .value { font-size: 22px; font-weight: 700; color: #2563EB; margin: 4px 0; }
+        .kpi-card .label { font-size: 12px; color: #64748b; }
+        .kpi-card .sub { font-size: 11px; color: #94a3b8; }
+        .row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .row-full { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
+        .row-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .card h3 { font-size: 14px; margin-bottom: 12px; color: #334155; }
+        .card img { width: 100%; height: auto; border-radius: 4px; }
+        .btn-group { display: flex; gap: 8px; margin-bottom: 16px; }
+        .btn { display: inline-block; padding: 8px 20px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .btn-primary { background: #2563EB; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #059669; color: white; }
+        .btn-success:hover { background: #047857; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #f1f5f9; padding: 8px; text-align: left; font-weight: 600; }
+        td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+        @media (max-width: 768px) {
+            .row { grid-template-columns: 1fr; }
+            .row-3col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>电商数据分析看板</h1>
+    <p>数据驱动运营 · 基于 {{ metrics.total_users }} 用户 · {{ metrics.total_orders }} 订单</p>
+</div>
+<div class="container">
+
+    <div class="btn-group">
+        <a href="/report/pdf" class="btn btn-success" target="_blank">导出 PDF 报告</a>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="label">总 GMV</div>
+            <div class="value">{{ "%.2f"|format(metrics.total_gmv) }}</div>
+            <div class="sub">元</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">总订单数</div>
+            <div class="value">{{ metrics.total_orders }}</div>
+            <div class="sub">已完成 {{ metrics.completed_orders }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">客单价 AOV</div>
+            <div class="value">{{ "%.2f"|format(metrics.aov) }}</div>
+            <div class="sub">元/单</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">复购率</div>
+            <div class="value">{{ metrics.repeat_purchase_rate }}%</div>
+            <div class="sub">多次购买 / 总购买</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">转化率</div>
+            <div class="value">{{ metrics.conversion_rate }}%</div>
+            <div class="sub">购买 / 总行为</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">总用户</div>
+            <div class="value">{{ metrics.total_users }}</div>
+            <div class="sub">购买用户 {{ metrics.buying_users }}</div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row">
+        <div class="card"><h3>每日 GMV 趋势</h3><img src="/charts/daily_sales.png" alt="每日GMV"></div>
+        <div class="card"><h3>支付方式分布</h3><img src="/charts/payment_dist.png" alt="支付方式"></div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row">
+        <div class="card"><h3>月度 GMV 与订单量</h3><img src="/charts/monthly_trend.png" alt="月度趋势"></div>
+        <div class="card"><h3>设备来源分布</h3><img src="/charts/device_dist.png" alt="设备来源"></div>
+    </div>
+
+    <!-- Charts Row 3 -->
+    <div class="row-3col">
+        <div class="card"><h3>品类 GMV 排名</h3><img src="/charts/category_gmv.png" alt="品类GMV"></div>
+        <div class="card"><h3>RFM 用户分层</h3><img src="/charts/rfm_segments.png" alt="RFM"></div>
+        <div class="card"><h3>用户年龄分布</h3><img src="/charts/age_dist.png" alt="年龄"></div>
+    </div>
+
+    <!-- RFM Table -->
+    <div class="row-full">
+        <div class="card">
+            <h3>RFM 客户分层明细（Top 100）</h3>
+            <div style="overflow-x:auto;">
+            <table id="rfm-table">
+                <thead><tr><th>用户ID</th><th>最近购买(天)</th><th>购买频次</th><th>消费金额</th><th>R</th><th>F</th><th>M</th><th>分层</th><th>性别</th><th>年龄</th><th>城市</th><th>VIP等级</th></tr></thead>
+                <tbody id="rfm-body"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    fetch("/api/rfm").then(r=>r.json()).then(data => {
+        const tbody = document.getElementById("rfm-body");
+        data.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${row.user_id}</td><td>${row.recency}</td><td>${row.frequency}</td><td>${row.monetary.toFixed(2)}</td>
+                <td>${row.R}</td><td>${row.F}</td><td>${row.M}</td><td>${row.segment}</td>
+                <td>${row.gender||"-"}</td><td>${row.age||"-"}</td><td>${row.city||"-"}</td><td>${row.vip_level||"-"}</td>`;
+            tbody.appendChild(tr);
+        });
+    });
+</script>
+</body>
+</html>
